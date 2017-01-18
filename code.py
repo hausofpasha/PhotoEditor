@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 
 import sys
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QWidget, qApp, QAction
+from PyQt5 import QtCore, QtWidgets, QtGui
+
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from PIL import ImageGrab
+from PIL import ImageGrab, Image
 import time
 
 
@@ -34,6 +33,11 @@ class Example(QWidget):
         self.Text2_case = 'none'
         self.Text1_text = ''
         self.Text2_text = ''
+
+        self.tlen = QFrame(self)  # тлен
+        self.tlen.setGeometry(0, 0, 800, 580)
+        self.tlen.setStyleSheet("background-image: url('css/tlen.png');  ")  #filter: alpha(opacity=50);
+        self.tlen.setVisible(False)
 
         self.lbl1 = QLabel(self)    # тексты
         self.lbl2 = QLabel(self)
@@ -111,8 +115,18 @@ class Example(QWidget):
         combo.move(580, 504)
         combo.activated[str].connect(self.ChangeFont)
 
+        combo2 = QComboBox(self)
+        combo2.addItem(" Эффекты ")
+        combo2.addItem("Тлен")
+        combo2.addItem("Салюты1")
+        combo2.addItem("Салюты2")
+        combo2.addItem("Убрать")
+        combo2.move(580, 534)
+        combo2.activated[str].connect(self.ChangeEffect)
+
+
         cb = QCheckBox('caps lock', self)   # чекбокс выбор шрифта
-        cb.move(600, 530)
+        cb.move(550, 560)
         cb.stateChanged.connect(self.CheckBoxUpperCase)
 
         btn_save = QPushButton("\n\nСохранить\n\n", self)
@@ -130,7 +144,7 @@ class Example(QWidget):
 
         self.setFixedSize(800,580)
         self.center()
-        self.setWindowTitle('Photo Editor v1.0')
+        self.setWindowTitle('Photo Editor')
         self.setWindowIcon(QIcon('css/icon.png'))
         self.show()
 
@@ -181,15 +195,15 @@ class Example(QWidget):
        print('open file dialog')
        options = QFileDialog.Options()
        options |= QFileDialog.DontUseNativeDialog
-       fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "templates/",
+       fileName, _ = QFileDialog.getOpenFileName(self, "Выбрать картинку", "templates/",
                                                  "All Files (*); Images (*.png *.jpeg *.jpg)", options=options)
        if fileName:
            print(fileName)
            oImage = QImage(fileName)
            sImage = oImage.scaled(QSize(800, 500))  # resize Image to widgets size
-           palette = QPalette()
-           palette.setBrush(10, QBrush(sImage))  # 10 = Windowrole
-           self.setPalette(palette)
+           self.palette = QPalette()
+           self.palette.setBrush(10, QBrush(sImage))  # 10 = Windowrole
+           self.setPalette(self.palette)
 
     def ChangeColour(self):
         print(' open colour popup')
@@ -219,6 +233,24 @@ class Example(QWidget):
             self.lbl2.setStyleSheet("QLabel { text-transform: " + self.Text2_case + "; " + "color: " + self.TextColour + "}")
             self.lbl1.adjustSize()
             self.lbl2.adjustSize()
+
+    def ChangeEffect(self,text):
+        if text == 'Убрать':
+            print(text)
+            self.tlen.setVisible(False)
+        if text == 'Тлен':
+            print(text)
+            self.tlen.setStyleSheet("background-image: url('css/tlen.png');  ")
+            self.tlen.setVisible(True)
+        if text == 'Салюты1':
+            print(text)
+            self.tlen.setStyleSheet("background-image: url('css/firework.png');  ")
+            self.tlen.setVisible(True)
+        if text == 'Салюты2':
+            print(text)
+            self.tlen.setStyleSheet("background-image: url('css/firework2.png');  ")
+            self.tlen.setVisible(True)
+
 
     def ChangeFont(self,text):
         if text == 'Impact':
